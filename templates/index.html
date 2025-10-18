@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>LEVEL UP — Personal Trainer</title>
+
+<!-- Fonts & icons -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  input, select {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: none;
+  background: #add8e6;   /* light blue background */
+  color: #000;           /* black text for contrast */
+  font-size: 15px;
+  outline: none;
+  transition: box-shadow .18s var(--ease), transform .18s var(--ease);
+  appearance: none;       /* removes default browser styling */
+  cursor: pointer;
+}
+
+/* Dropdown options */
+select option {
+  background: #add8e6;   /* light blue options */
+  color: #000;
+}
+
+main.viewport { visibility: hidden; }
+
+/* Hover effect for dropdown items */
+select option:hover {
+  background: #87ceeb;   /* slightly darker blue */
+  color: #000;
+}
+  :root{
+    --bg-1:#07122a; --bg-2:#0b2340;
+    --accent-1:#3b82f6; --accent-2:#60a5fa;
+    --muted:#9fb7d9; --card-radius:16px; --glass:rgba(255,255,255,0.04);
+    --ease:cubic-bezier(.16,.84,.44,1);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    background:linear-gradient(180deg,var(--bg-1),var(--bg-2));
+    color:#e8f3ff; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  }
+
+  /* subtle background photo */
+  body::before{
+    content:""; position:fixed; inset:0;
+    background-image: url('https://images.unsplash.com/photo-1554284126-2b94f7cb4b9b?auto=format&fit=crop&w=1950&q=80');
+    background-size:cover; background-position:center; opacity:0.22; filter: blur(6px) saturate(.9);
+    z-index:0;
+  }
+
+  .app{position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; padding:36px 18px 80px;}
+  header{width:100%; max-width:1100px; display:flex; align-items:center; gap:12px; margin-bottom:18px; justify-content:center;}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{
+    width:60px;height:60px;border-radius:14px;background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+    box-shadow:0 10px 30px rgba(59,130,246,0.12);display:flex;align-items:center;justify-content:center;font-weight:800;color:#042033;
+    transform:rotate(8deg);
+  }
+  h1{margin:0;font-size:18px;color:#eaf5ff}
+  .subtitle{font-size:12px;color:var(--muted)}
+
+  /* container for pages stacked */
+  .viewport{width:100%;max-width:1100px;position:relative;min-height:640px;overflow:hidden}
+  .page{
+    position:absolute; inset:0; padding:28px; overflow:auto; -webkit-backdrop-filter: blur(8px);backdrop-filter: blur(8px);
+    transition: transform .45s var(--ease), opacity .45s var(--ease); transform-origin:center; z-index:1;
+  }
+  .page.hidden{opacity:0; pointer-events:none; transform:translateY(16px) scale(.996)}
+  .page.visible{opacity:1; pointer-events:auto; transform:none}
+
+  /* glass card */
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+    border-radius:var(--card-radius); padding:20px; box-shadow:0 10px 40px rgba(0,0,0,0.6);
+    border:1px solid rgba(255,255,255,0.03);
+  }
+
+  /* auth layout */
+  .auth-center{width:100%;max-width:420px;margin:20px auto;display:flex;flex-direction:column;gap:12px}
+  label{font-size:13px;color:var(--muted)}
+  input, select{
+    padding:12px 14px;border-radius:12px;border:none;background:rgba(255,255,255,0.03);color:#e8f3ff;font-size:15px;outline:none;
+    transition: box-shadow .18s var(--ease), transform .18s var(--ease);
+  }
+  input:focus, select:focus{ box-shadow:0 8px 24px rgba(59,130,246,0.08); transform: translateY(-2px) }
+
+  .muted{color:var(--muted);font-size:13px;margin-top:6px}
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:none;cursor:pointer;font-weight:700;
+    background: linear-gradient(135deg,var(--accent-1),var(--accent-2)); color:#042033; box-shadow: 0 12px 30px rgba(59,130,246,0.14);
+    transition: transform .18s var(--ease), box-shadow .18s var(--ease);
+  }
+  .btn:hover{ transform: translateY(-3px); box-shadow: 0 18px 40px rgba(59,130,246,0.20) }
+  .btn.ghost{ background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); color:#e8f3ff; box-shadow:none; border:1px solid rgba(255,255,255,0.04) }
+
+  /* small helpers */
+  .center{text-align:center}
+  .row{display:flex;gap:12px}
+  .small{font-size:13px;color:var(--muted)}
+  .link{color:var(--accent-2);cursor:pointer;text-decoration:underline}
+
+  /* dashboard grid */
+  .grid{display:grid;gap:20px;grid-template-columns:repeat(12,1fr)}
+  .left{grid-column:1 / span 5}
+  .right{grid-column:6 / span 7}
+  @media(max-width:900px){ .left,.right{grid-column:1 / -1} }
+
+  .stat{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px dashed rgba(59,130,246,0.06);margin-bottom:10px}
+  .pill{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);font-size:13px;color:var(--muted)}
+
+  /* plan steps */
+  .plan-cards{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .step{background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:12px; border-radius:12px; display:flex; gap:12px; align-items:flex-start}
+  .step img{width:120px;height:80px;object-fit:cover;border-radius:10px;flex-shrink:0;cursor:pointer}
+  .step h4{margin:0;color:var(--accent-2)}
+  .step p{margin:6px 0 0 0;color:var(--muted);font-size:14px;line-height:1.45}
+
+  .exercise{cursor:pointer;padding:12px;border-radius:12px;background:linear-gradient(90deg, rgba(59,130,246,0.04), rgba(96,165,250,0.02));border:1px solid rgba(59,130,246,0.06);display:flex;justify-content:space-between;align-items:center}
+  .exercise + .exercise-detail{max-height:0;overflow:hidden;transition:max-height .35s var(--ease)}
+  .exercise.open + .exercise-detail{max-height:1000px;padding:12px;margin-top:8px}
+  .exercise-detail p{color:var(--muted);margin:8px 0;font-size:14px;line-height:1.55}
+
+  .logs{display:flex;flex-direction:column;gap:8px;max-height:220px;overflow:auto;padding-right:6px}
+  .log-item{background:rgba(255,255,255,0.02);padding:8px 10px;border-radius:10px;display:flex;justify-content:space-between;color:var(--muted);font-size:13px}
+
+  /* modal */
+  .modal {
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(2,6,23,0.6); z-index:1000; opacity:0; pointer-events:none;
+    transition: opacity .25s ease;
+  }
+  .modal.open{opacity:1; pointer-events:auto}
+  .modal .box { max-width:90%; max-height:90%; border-radius:12px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.6) }
+  .modal img { display:block; width:100%; height:auto; object-fit:cover; }
+
+  /* input error (shake) */
+  .shake { animation: shake .5s; }
+  @keyframes shake {
+    10%,90%{transform:translateX(-1px)}
+    20%,80%{transform:translateX(2px)}
+    30%,50%,70%{transform:translateX(-4px)}
+    40%,60%{transform:translateX(4px)}
+  }
+
+  .error { color:#ffb4b4; background: rgba(248,113,113,0.08); padding:8px 10px; border-radius:8px; border:1px solid rgba(248,113,113,0.12); font-size:14px; margin-top:8px }
+
+  /* small fade-in for cards */
+  .fade-in { animation: fadeCard .45s var(--ease) both; }
+  @keyframes fadeCard { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none} }
+
+  footer{max-width:1100px;margin:30px auto 0;color:var(--muted);font-size:13px;text-align:center}
+</style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <div class="logo">LU</div>
+        <div>
+          <h1>LEVEL UP</h1>
+          <div class="subtitle">Personalized diet & training — in your browser</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="viewport" aria-live="polite">
+      <!-- SIGNUP PAGE -->
+      <section id="signupPage" class="page hidden" role="region" aria-label="Sign up">
+        <div class="auth-center card fade-in">
+          <h2 class="center"><i class="fa-solid fa-user-plus" style="color:var(--accent-2)"></i> Create account</h2>
+
+          <div>
+            <label for="su_name">Full name</label>
+            <input id="su_name" placeholder="Your name" autocomplete="name" />
+          </div>
+          <div>
+            <label for="su_email">Email</label>
+            <input id="su_email" type="email" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <div>
+            <label for="su_phone">Phone</label>
+            <input id="su_phone" placeholder="+91 00000 0000" />
+          </div>
+          <div>
+            <label for="su_pass">Password</label>
+            <input id="su_pass" type="password" placeholder="Choose a password" autocomplete="new-password" />
+            <div class="muted" style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+              <input id="su_show" type="checkbox" /> <label for="su_show" style="margin:0">Show password</label>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;justify-content:center;margin-top:12px">
+            <button class="btn" id="signupBtn"><i class="fa-solid fa-user-plus"></i> Sign up</button>
+            <button class="btn ghost" id="toLoginBtn">Login</button>
+          </div>
+
+          <div id="signupError" class="error" style="display:none"></div>
+          <div class="muted center" style="margin-top:10px">GET FIT.</div>
+        </div>
+      </section>
+
+      <!-- LOGIN PAGE -->
+      <section id="loginPage" class="page visible" role="region" aria-label="Login">
+        <div class="auth-center card fade-in">
+          <h2 class="center"><i class="fa-solid fa-right-to-bracket" style="color:var(--accent-2)"></i> Welcome back</h2>
+
+          <div>
+            <label for="li_email">Email</label>
+            <input id="li_email" type="email" placeholder="you@example.com" />
+          </div>
+          <div>
+            <label for="li_pass">Password</label>
+            <input id="li_pass" type="password" placeholder="Password" autocomplete="current-password" />
+            <div class="muted" style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+              <input id="li_show" type="checkbox" /> <label for="li_show" style="margin:0">Show password</label>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;justify-content:center;margin-top:12px">
+            <button class="btn" id="loginBtn"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+            <button class="btn ghost" id="toSignupBtn">Sign up</button>
+          </div>
+          <div class="small center link" id="toForgotBtn" style="margin-top:15px;">Forgot Password?</div>
+
+          <div id="loginError" class="error" style="display:none"></div>
+          <div class="muted center" style="margin-top:10px">Sign in to load your saved plan and logs.</div>
+        </div>
+      </section>
+
+      <section id="forgotPage" class="page hidden" role="region" aria-label="Forgot Password">
+  <div class="auth-center card fade-in">
+    <h2 class="center"><i class="fa-solid fa-key" style="color:var(--accent-2)"></i> Reset Password</h2>
+    <div>
+      <label for="fp_email">Enter your account email</label>
+      <input id="fp_email" type="email" placeholder="you@example.com" />
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn" id="forgotSubmitBtn">Get Reset Link</button>
+    </div>
+    <div id="forgotMsg" class="muted center" style="margin-top:10px"></div>
+  </div>
+</section>
+
+<section id="resetPage" class="page hidden" role="region" aria-label="Set New Password">
+  <div class="auth-center card fade-in">
+    <h2 class="center"><i class="fa-solid fa-lock" style="color:var(--accent-2)"></i> Set a New Password</h2>
+    <div class="muted center" style="margin-bottom:10px;">Token detected. Please enter your new password.</div>
+    <div>
+      <label for="rp_pass">New Password</label>
+      <input id="rp_pass" type="password" placeholder="Choose a new password" />
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn" id="resetSubmitBtn">Update Password</button>
+    </div>
+    <div id="resetError" class="error" style="display:none"></div>
+  </div>
+</section>
+
+      <!-- DASHBOARD (enter details) -->
+      <section id="dashPage" class="page hidden" role="region" aria-label="Enter details">
+        <div style="width:100%;max-width:1100px;margin:auto;">
+          <div class="grid">
+            <div class="left">
+              <div class="card fade-in">
+                <h3><i class="fa-solid fa-person"></i> Your Details</h3>
+                <div style="margin-top:10px">
+                  <label for="age">Age</label>
+                  <input id="age" type="number" min="10" max="100" placeholder="Years" />
+                </div>
+                <div style="margin-top:10px">
+                  <label for="height">Height (cm)</label>
+                  <input id="height" type="number" min="80" max="230" placeholder="cm" />
+                </div>
+                <div style="margin-top:10px">
+                  <label for="weight">Weight (kg)</label>
+                  <input id="weight" type="number" min="30" max="300" placeholder="kg" />
+                </div>
+
+                <div style="margin-top:10px">
+                  <label for="bodyType">Body Type</label>
+                  <select id="bodyType">
+                    <option value="">Select body type</option>
+                    <option value="ectomorph">Ectomorph — lean, hard gainer</option>
+                    <option value="mesomorph">Mesomorph — athletic, builds muscle</option>
+                    <option value="endomorph">Endomorph — stores fat easier</option>
+                  </select>
+                  <div id="bodyExplain" class="muted" style="margin-top:8px; min-height:44px;"></div>
+                </div>
+
+                <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+                  <button class="btn" id="generateBtn"><i class="fa-solid fa-magic-wand-sparkles"></i> Generate Plan</button>
+                  <button class="btn ghost" id="saveDetailsBtn"><i class="fa-solid fa-save"></i> Save Details</button>
+                </div>
+
+                <div id="saveMsg" class="muted" style="margin-top:8px"></div>
+              </div>
+
+              <div class="card fade-in" style="margin-top:14px">
+                <h3><i class="fa-solid fa-scale-balanced"></i> Quick Stats</h3>
+                <div id="statsArea">
+                  <div class="stat"><div class="muted">BMI</div><div class="pill">—</div></div>
+                  <div class="stat"><div class="muted">Last Saved</div><div class="pill">—</div></div>
+                </div>
+              </div>
+
+              <div class="card fade-in" style="margin-top:14px">
+                <h3><i class="fa-solid fa-clock"></i> Progress Tracker</h3>
+                <div style="display:flex;gap:8px;margin-bottom:8px">
+                  <input id="logWeight" placeholder="Weight (kg)" />
+                  <button class="btn ghost" id="addLogBtn">Add</button>
+                </div>
+                <div class="logs" id="logsList"><div class="muted">No logs yet.</div></div>
+              </div>
+            </div>
+
+            <div class="right">
+              <div class="card fade-in">
+                <h3><i class="fa-solid fa-utensils"></i> Diet Snapshot</h3>
+                <div id="dietSnapshot" class="muted">Enter details to preview meal ideas for your body type.</div>
+              </div>
+
+              <div class="card fade-in" style="margin-top:14px">
+                <h3><i class="fa-solid fa-dumbbell"></i> Workout Snapshot</h3>
+                <div id="workoutSnapshot" class="muted">Enter details to preview workout routines for your body type.</div>
+              </div>
+
+              <div class="card fade-in" style="margin-top:14px">
+                <h3><i class="fa-solid fa-cog"></i> Account</h3>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                  <button class="btn" id="viewPlanBtn"><i class="fa-solid fa-eye"></i> View last plan</button>
+                  <button class="btn ghost" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+                </div>
+                <div class="muted" style="margin-top:12px">Your data is saved to your browser only.</div>
+              </div>
+            </div>
+
+          </div> <!-- grid -->
+        </div>
+      </section>
+
+      <!-- PLAN PAGE -->
+      <section id="planPage" class="page hidden" role="region" aria-label="Personalised plan">
+        <div class="plan-page card fade-in" style="padding-bottom:28px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+            <div>
+              <h2 id="planTitle">Your Personalised Plan</h2>
+              <div class="muted" id="planSubtitle">Detailed diet & workouts — step by step</div>
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn ghost" id="backToDash"><i class="fa-solid fa-arrow-left"></i> Back</button>
+              <button class="btn" id="savePlanBtn"><i class="fa-solid fa-floppy-disk"></i> Save Plan</button>
+            </div>
+          </div>
+
+          <div class="plan-cards" style="margin-top:16px">
+            <div class="card">
+              <h3><i class="fa-solid fa-scale-balanced icon"></i> BMI & Summary</h3>
+              <div id="planBMI" class="muted">—</div>
+              <div id="planSummary" class="muted" style="margin-top:8px;"></div>
+            </div>
+
+            <div class="card">
+              <h3><i class="fa-solid fa-utensils icon"></i> Diet — Step by Step</h3>
+              <div id="dietSteps"></div>
+            </div>
+
+            <div class="card">
+              <h3><i class="fa-solid fa-dumbbell icon"></i> Workouts — Step by Step</h3>
+              <div id="workoutSteps"></div>
+            </div>
+
+            <div class="card">
+              <h3><i class="fa-solid fa-lightbulb icon"></i> Tips & Progress</h3>
+              <div id="quickTips" class="muted"></div>
+              <hr style="border-color: rgba(255,255,255,0.04)" />
+              <h4 style="margin-top:8px">Weight Logs</h4>
+              <div class="logs" id="planLogs"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>LEVEL UP</footer>
+  </div>
+
+  <!-- Image modal -->
+  <div id="imgModal" class="modal" aria-hidden="true" onclick="closeModal()">
+    <div class="box" onclick="event.stopPropagation()">
+      <img id="modalImg" src="" alt="Big view">
+    </div>
+  </div>
+
+<script>
+let currentPlanDataForSave = null;
+
+/* ---------------------------
+   Page show/hide helpers
+   --------------------------- */
+function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('hidden');
+    requestAnimationFrame(()=> el.classList.add('visible'));
+    document.querySelectorAll('.page').forEach(p=> { if(p.id !== id) p.classList.remove('visible'); });
+}
+
+/* ---------------------------
+   Auth, Session & Password Reset
+   --------------------------- */
+document.getElementById('toSignupBtn').addEventListener('click', () => showPage('signupPage'));
+document.getElementById('toLoginBtn').addEventListener('click', () => showPage('loginPage'));
+document.getElementById('su_show')?.addEventListener('change', e => document.getElementById('su_pass').type = e.target.checked ? 'text' : 'password');
+document.getElementById('li_show')?.addEventListener('change', e => document.getElementById('li_pass').type = e.target.checked ? 'text' : 'password');
+
+// NEW listener for forgot password link
+document.getElementById('toForgotBtn')?.addEventListener('click', () => showPage('forgotPage'));
+
+// Signup
+document.getElementById('signupBtn').addEventListener('click', async () => {
+    const name = document.getElementById('su_name').value.trim();
+    const email = (document.getElementById('su_email').value || '').trim().toLowerCase();
+    const phone = document.getElementById('su_phone').value.trim();
+    const pass  = document.getElementById('su_pass').value;
+    const errEl = document.getElementById('signupError');
+    errEl.style.display='none';
+    if(!name || !email || !phone || !pass) return showError(errEl, 'Please fill all fields.');
+    try {
+        const response = await fetch('/api/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, phone, password: pass }) });
+        if (response.ok) { alert('Account created! Please log in.'); document.getElementById('li_email').value = email; showPage('loginPage'); } 
+        else { const errorData = await response.json(); showError(errEl, errorData.error || 'An unknown error occurred.'); }
+    } catch (error) { showError(errEl, 'Could not connect to the server.'); }
+});
+
+// Login
+document.getElementById('loginBtn').addEventListener('click', async () => {
+    const email = (document.getElementById('li_email').value || '').trim().toLowerCase();
+    const pass  = document.getElementById('li_pass').value;
+    const errEl = document.getElementById('loginError');
+    errEl.style.display='none';
+    if(!email || !pass) return showError(errEl, 'Please enter email and password.');
+    try {
+        const response = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password: pass }) });
+        if (response.ok) { const data = await response.json(); await loadUserToDashboard(data.user); showPage('dashPage'); } 
+        else { const errorData = await response.json(); showError(errEl, errorData.error || 'Login failed.'); }
+    } catch (error) { showError(errEl, 'Could not connect to the server.'); }
+});
+
+// Forgot password form
+document.getElementById('forgotSubmitBtn')?.addEventListener('click', async () => {
+    const email = document.getElementById('fp_email').value;
+    const msgEl = document.getElementById('forgotMsg');
+    if (!email) return msgEl.innerText = "Please enter an email.";
+
+    await fetch('/api/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    });
+    msgEl.innerHTML = `<strong>Check your server's console.</strong><br>If that email exists, a reset link has been printed there.`;
+});
+
+// Final reset password form
+document.getElementById('resetSubmitBtn')?.addEventListener('click', async () => {
+    const newPassword = document.getElementById('rp_pass').value;
+    const errEl = document.getElementById('resetError');
+    const token = window.location.pathname.split('/').pop();
+    
+    if (!newPassword) return showError(errEl, 'Please enter a new password.');
+    
+    try {
+        const response = await fetch(`/api/reset-password/${token}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: newPassword })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            alert(data.message);
+            window.location.href = '/';
+        } else {
+            showError(errEl, data.error || 'Failed to reset password.');
+        }
+    } catch(e) { showError(errEl, 'Could not connect to the server.'); }
+});
+
+// Updated checkSession
+async function checkSession() {
+    const viewport = document.querySelector('.viewport');
+    const path = window.location.pathname;
+
+    if (path.startsWith('/reset-password/')) {
+        showPage('resetPage');
+        viewport.style.visibility = 'visible';
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/status');
+        if (response.ok) {
+            const data = await response.json();
+            await loadUserToDashboard(data.user);
+            showPage('dashPage');
+        } else {
+            showPage('loginPage');
+        }
+    } catch(e) {
+        console.error("Connection error", e);
+        showPage('loginPage');
+    } finally {
+        viewport.style.visibility = 'visible';
+    }
+}
+
+/* ---------------------------
+   Dashboard Data & UI
+   --------------------------- */
+async function loadUserToDashboard(userData){
+    if(!userData) return;
+    document.querySelector('.brand h1').innerText = `LEVEL UP — ${userData.name || ''}`;
+    await fetchAndRenderDetails();
+    await fetchAndRenderLogs();
+}
+
+async function fetchAndRenderDetails() {
+    try {
+        const response = await fetch('/api/details');
+        if (!response.ok) return;
+        const details = await response.json();
+        document.getElementById('age').value = details.age || '';
+        document.getElementById('height').value = details.height || '';
+        document.getElementById('weight').value = details.weight || '';
+        document.getElementById('bodyType').value = details.bodyType || '';
+        document.getElementById('bodyType').dispatchEvent(new Event('change'));
+        renderStats(details);
+    } catch(e) { console.error("Could not fetch details", e); }
+}
+
+async function fetchAndRenderLogs() {
+    try {
+        const response = await fetch('/api/logs');
+        if (!response.ok) return;
+        const logs = await response.json();
+        renderLogs(logs);
+    } catch(e) { console.error("Could not fetch logs", e); }
+}
+
+function renderStats(details = {}){
+    const { height, weight } = details;
+    const bmi = computeBMI(height, weight);
+    const bmiText = bmi ? `${bmi} (${bmiCategory(bmi)})` : '—';
+    document.getElementById('statsArea').innerHTML = `
+        <div class="stat"><div class="muted">BMI</div><div class="pill">${bmiText}</div></div>
+        <div class="stat"><div class="muted">Last Saved</div><div class="pill">${details.age ? new Date().toLocaleDateString() : '—'}</div></div>`;
+}
+
+function renderLogs(logs = []){
+    const logsBox = document.getElementById('logsList');
+    const planLogsBox = document.getElementById('planLogs');
+    logsBox.innerHTML = '';
+    planLogsBox.innerHTML = '';
+    if (!logs.length) { 
+        const msg = '<div class="muted">No logs yet.</div>'; 
+        logsBox.innerHTML = msg; 
+        planLogsBox.innerHTML = msg; 
+        return; 
+    }
+    logs.forEach(log => {
+        const d = document.createElement('div');
+        d.className='log-item';
+        d.innerHTML = `<div>${new Date(log.date).toLocaleString()}</div><div><b>${log.weight} kg</b></div>`;
+        logsBox.appendChild(d);
+        if(planLogsBox) planLogsBox.appendChild(d.cloneNode(true));
+    });
+}
+
+document.getElementById('saveDetailsBtn').addEventListener('click', async () => {
+    const details = { 
+        age: document.getElementById('age').value, 
+        height: document.getElementById('height').value, 
+        weight: document.getElementById('weight').value, 
+        bodyType: document.getElementById('bodyType').value 
+    };
+    try {
+        const response = await fetch('/api/details', { 
+            method: 'POST', headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify(details) 
+        });
+        if (response.ok) {
+            const msgEl = document.getElementById('saveMsg');
+            msgEl.innerText='Details saved!';
+            setTimeout(()=> msgEl.innerText='', 2400);
+            renderStats(details);
+        } else { alert('Failed to save details.'); }
+    } catch(e) { alert('Error saving details.'); }
+});
+
+document.getElementById('addLogBtn').addEventListener('click', async () => {
+    const weightInput = document.getElementById('logWeight');
+    if (!weightInput.value) return alert('Please enter a weight.');
+    try {
+        const response = await fetch('/api/logs', { 
+            method: 'POST', headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify({ weight: weightInput.value }) 
+        });
+        if (response.ok) { weightInput.value = ''; await fetchAndRenderLogs(); } 
+        else { const errorData = await response.json(); alert(`Failed to add log: ${errorData.error}`); }
+    } catch(e) { alert('Error adding log.'); }
+});
+
+document.getElementById('generateBtn').addEventListener('click', async () => {
+    const details = { 
+        age: document.getElementById('age').value, 
+        height: document.getElementById('height').value, 
+        weight: document.getElementById('weight').value, 
+        bodyType: document.getElementById('bodyType').value 
+    };
+    if (!details.age || !details.height || !details.weight || !details.bodyType) 
+        return alert('Please fill in all your details first!');
+    try {
+        const response = await fetch('/api/generate-plan', { 
+            method: 'POST', headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify({ bodyType: details.bodyType }) 
+        });
+        if (response.ok) { 
+            const planData = await response.json(); 
+            buildPlanPage(planData, details); 
+            showPage('planPage'); 
+        } else { 
+            const err = await response.json(); 
+            alert(`Error generating plan: ${err.error}`); 
+        }
+    } catch(e) { alert('Could not connect to server to generate plan.'); }
+});
+
+function buildPlanPage(planData, userDetails) {
+    const { diet, workouts } = planData;
+    const bmi = computeBMI(userDetails.height, userDetails.weight);
+    const cat = bmi ? bmiCategory(bmi) : '—';
+    document.getElementById('planTitle').innerText = `Plan for ${capitalize(userDetails.bodyType)}`;
+    document.getElementById('planSubtitle').innerText = 
+        `Age ${userDetails.age} · ${userDetails.height} cm · ${userDetails.weight} kg · BMI ${bmi || '—'} (${cat})`;
+    document.getElementById('planBMI').innerHTML = 
+        `<div class="muted">BMI <strong style="color:var(--accent-2);">${bmi || '—'}</strong> — ${cat}</div>`;
+    
+    const dietStepsArea = document.getElementById('dietSteps');
+    const workoutStepsArea = document.getElementById('workoutSteps');
+    dietStepsArea.innerHTML = '';
+    workoutStepsArea.innerHTML = '';
+
+    const IMAGES = { 
+        diet: 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1', 
+        workout: 'https://images.unsplash.com/photo-1554284126-aa88f22d8b74' 
+    };
+
+    diet.forEach(item => 
+        dietStepsArea.innerHTML += `<div class="step"><img src="${IMAGES.diet}"><div class="meta"><h4>${item.title}</h4><p>${item.steps.join('<br>')}</p></div></div>`
+    );
+    workouts.forEach(block => {
+        let exercisesHtml = block.exercises.map(ex => 
+            `<div class="step"><img src="${IMAGES.workout}"><div class="meta"><h4>${ex.name}</h4><p>${ex.steps.join('<br>')}</p></div></div>`
+        ).join('');
+        workoutStepsArea.innerHTML += `<div class="card">${exercisesHtml}</div>`;
+    });
+}
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await fetch('/api/logout', { method: 'POST' });
+    document.querySelector('.brand h1').innerText = 'LEVEL UP';
+    ['age','height','weight','bodyType','logWeight'].forEach(id => document.getElementById(id).value = '');
+    showPage('loginPage');
+});
+
+document.getElementById('backToDash').addEventListener('click', () => showPage('dashPage'));
+
+/* --- UI Helpers --- */
+function showError(el, msg){ el.innerText = msg; el.style.display = 'block'; el.classList.remove('shake'); void el.offsetWidth; }
+function capitalize(s){ return s && s[0].toUpperCase() + s.slice(1); }
+function computeBMI(h, w){ if(!parseFloat(h) || !parseFloat(w)) return null; return Math.round((parseFloat(w) / ((parseFloat(h)/100)**2))*10)/10; }
+function bmiCategory(bmi){ if(bmi < 18.5) return 'Underweight'; if(bmi < 25) return 'Normal'; if(bmi < 30) return 'Overweight'; return 'Obese'; }
+
+document.getElementById('bodyType').addEventListener('change', (e)=> {
+  const v = e.target.value;
+  let html = '';
+  if(v==='ectomorph') html = '<strong>Ectomorph</strong>: naturally lean, fast metabolism — focus on calorie + protein surplus and compound lifts.';
+  else if(v==='mesomorph') html = '<strong>Mesomorph</strong>: athletic, responds well to training — balanced diet and mixed training (strength + conditioning).';
+  else if(v==='endomorph') html = '<strong>Endomorph</strong>: stores fat easier — prioritize lower carbs, more cardio, HIIT + resistance training.';
+  document.getElementById('bodyExplain').innerHTML = html;
+});
+
+// --- Generate Plan ---
+document.getElementById("generateBtn")?.addEventListener("click", async () => {
+  const age = document.getElementById("age")?.value;
+  const height = document.getElementById("height")?.value;
+  const weight = document.getElementById("weight")?.value;
+  const bodyType = document.getElementById("bodyType")?.value;
+
+  if (!bodyType) {
+    alert("Please select a body type first!");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/generate-plan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ age, height, weight, bodyType }),
+    });
+
+    if (!response.ok) throw new Error("Failed to generate plan.");
+    const planData = await response.json();
+
+    renderPlanPage(planData, bodyType);
+    currentPlanDataForSave = {
+      planData,
+      userDetails: { age, height, weight, bodyType },
+    };
+    showPage("planPage");
+  } catch (err) {
+    console.error(err);
+    alert("Error generating plan. Check if you are logged in.");
+  }
+});
+
+// --- View Last Plan ---
+document.getElementById("viewPlanBtn")?.addEventListener("click", async () => {
+  try {
+    const response = await fetch("/api/plans");
+    if (!response.ok) throw new Error("No saved plans available.");
+    const plans = await response.json();
+    if (plans.length === 0) {
+      alert("No saved plans found.");
+      return;
+    }
+    const latestPlan = plans[0].data.planData;
+    const bodyType = plans[0].data.userDetails.bodyType;
+    renderPlanPage(latestPlan, bodyType);
+    showPage("planPage");
+  } catch (err) {
+    console.error(err);
+    alert("Error fetching last plan. Make sure you are logged in.");
+  }
+});
+
+// --- Save Plan ---
+document.getElementById("savePlanBtn")?.addEventListener("click", async () => {
+  if (!currentPlanDataForSave) {
+    alert("No plan to save!");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/plans", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(currentPlanDataForSave),
+    });
+
+    if (response.ok) {
+      alert("Plan saved successfully!");
+    } else {
+      alert("Failed to save plan.");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error saving plan.");
+  }
+});
+
+// --- Render Plan UI ---
+function renderPlanPage(plan, bodyType) {
+  document.getElementById("planTitle").innerText = `${bodyType} Plan`;
+  document.getElementById("planSubtitle").innerText =
+    "Customized Diet and Workout Recommendations";
+
+  const dietSteps = plan.diet
+    .map(
+      (item) => `
+      <div class="step">
+        <h4>${item.title}</h4>
+        <p><strong>Time:</strong> ${item.time}</p>
+        <ul>${item.steps.map((s) => `<li>${s}</li>`).join("")}</ul>
+      </div>`
+    )
+    .join("");
+
+  const workoutSteps = plan.workouts
+    .map(
+      (w) => `
+      <div class="step">
+        <h4>${w.level}</h4>
+        <p>${w.desc}</p>
+        <ul>${w.exercises
+          .map(
+            (ex) =>
+              `<li><strong>${ex.name}:</strong> ${ex.steps.join(", ")}</li>`
+          )
+          .join("")}</ul>
+      </div>`
+    )
+    .join("");
+
+  document.getElementById("dietSteps").innerHTML = dietSteps;
+  document.getElementById("workoutSteps").innerHTML = workoutSteps;
+}
+
+
+
+/* --- Init --- */
+(function init(){ checkSession(); })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+# Virtual Environment
+# This folder contains all the installed Python packages and should never be committed.
+venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Database file
+# It's good practice to ignore the database file so you don't commit user data.
+# The database can be recreated by running `flask db upgrade`.
+app.db
+
+# Flask instance folder (if you use one for secret configs)
+instance/
+
+# Editor-specific folders
+.vscode/
+.idea/
+
+# OS-generated files
+.DS_Store
+Thumbs.db

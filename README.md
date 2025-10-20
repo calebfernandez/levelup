@@ -1,22 +1,26 @@
 # Level Up - Personalized Fitness Planner
 
-![Level Up App Demo](<img src="data:image/svg+xml;utf8,
-<svg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'>
-<defs>
-<linearGradient id='gradLU' x1='0%' y1='0%' x2='100%' y2='100%'>
-<stop offset='0%' stop-color='%233b82f6'/>
-<stop offset='100%' stop-color='%2360a5fa'/>
-</linearGradient>
-</defs>
-<g transform='rotate(8 30 30)'>
-<rect x='5' y='5' width='50' height='50' rx='14' ry='14' fill='url(%23gradLU)'/>
-<text x='50%' y='57%' text-anchor='middle' font-family='Poppins, sans-serif' font-weight='800' font-size='24' fill='%23042033'>LU</text>
-</g>
-</svg>" width="60" height="60" alt="LU Logo" />
-)
+<p align="center">
+  <!-- App Demo Image -->
+  <img src="https://your-demo-image-link-here" alt="Level Up App Demo" width="300" style="vertical-align: middle;"/>
+  &nbsp;&nbsp;
+  <!-- Inline SVG LU Logo -->
+  <img src="data:image/svg+xml;utf8,
+  <svg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'>
+    <defs>
+      <linearGradient id='gradLU' x1='0%' y1='0%' x2='100%' y2='100%'>
+        <stop offset='0%' stop-color='%233b82f6'/>
+        <stop offset='100%' stop-color='%2360a5fa'/>
+      </linearGradient>
+    </defs>
+    <g transform='rotate(8 30 30)'>
+      <rect x='5' y='5' width='50' height='50' rx='14' ry='14' fill='url(%23gradLU)'/>
+      <text x='50%' y='57%' text-anchor='middle' font-family='Poppins, sans-serif' font-weight='800' font-size='24' fill='%23042033'>LU</text>
+    </g>
+  </svg>" width="60" height="60" alt="LU Logo" style="vertical-align: middle;"/>
+</p>
 
 A full-stack web application that generates personalized diet and workout plans based on user-specific data like age, weight, and body type. The application features a complete backend API built with Flask, secure user authentication, and a persistent database to save user progress and plans.
-
 **Live Demo:** [Link to your deployed application]
 
 ---
